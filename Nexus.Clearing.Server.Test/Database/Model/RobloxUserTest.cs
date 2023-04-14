@@ -42,4 +42,15 @@ public class RobloxUserTest
         user.SetGameIds(new List<long>() {123, 456, 789});
         Assert.That(user.GameIds, Is.EqualTo("123,456,789"));
     }
+    
+    /// <summary>
+    /// Tests SetGameIds with a null list.
+    /// </summary>
+    [Test]
+    public void TestSetGameIdsNull()
+    {
+        var user = new RobloxUser();
+        user.SetGameIds(null);
+        Assert.That(user.GameIds, Is.EqualTo(""));
+    }
 }

@@ -60,5 +60,5 @@ public class RobloxUser
     /// Sets the stored game ids.
     /// </summary>
     /// <param name="gameIds">Game ids to store.</param>
-    public void SetGameIds(IEnumerable<long> gameIds) => this.GameIds = string.Join(",", gameIds);
+    public void SetGameIds(IEnumerable<long>? gameIds) => this.GameIds = gameIds == null ? "" : string.Join(",", gameIds);
 }
