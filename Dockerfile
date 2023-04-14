@@ -4,15 +4,15 @@ ARG CONFIGURATION_FILE_PATH
 # Copy the application files and build them.
 WORKDIR /build
 COPY . .
-RUN dotnet build Nexus.Clearing.Server -c release -r linux-x64 --self-contained -o /publish
+RUN dotnet build Nexus.Clearing.Server -c release -r linux-musl-x64 --self-contained -o /publish
 
 # Switch to a container for runtime.
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 as runtime
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine as runtime
 
 # Prepare the runtime.
 WORKDIR /app
 COPY --from=build /publish .
-RUN apt-get update && apt-get install wget -y
+RUN apk add wget
 RUN ln -s Nexus.Clearing.Server.dll app.dll
 EXPOSE 8000
 ENTRYPOINT ["dotnet", "/app/app.dll"]
