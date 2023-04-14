@@ -6,6 +6,7 @@
 # Project-specific
 docker-compose.override.yml
 database.sqlite
+database.sqlite-*
 
 # User-specific files
 *.suo
