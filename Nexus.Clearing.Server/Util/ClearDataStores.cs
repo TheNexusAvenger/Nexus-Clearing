@@ -39,6 +39,7 @@ public static class ClearDataStores
                         dataStoreKeys = await context.DataStores.Where(dataStore => dataStore.GameId == gameIdFromPlaceId.Value).ToListAsync();
                         if (dataStoreKeys.Count != 0)
                         {
+                            Logger.Debug($"Place id {gameId} was converted to game id {gameIdFromPlaceId.Value}.");
                             gameId = gameIdFromPlaceId.Value;
                         }
                     }
