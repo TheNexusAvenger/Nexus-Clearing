@@ -15,7 +15,7 @@ public class RobloxUser
     /// Id of the user to clear.
     /// </summary>
     [Required]
-    public ulong UserId { get; set; }
+    public long UserId { get; set; }
 
     /// <summary>
     /// Game ids to clear as a comma separated list.

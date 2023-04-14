@@ -47,7 +47,7 @@ namespace Nexus.Clearing.Server.Migrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     GameIds = table.Column<string>(type: "TEXT", nullable: false),
                     RequestedTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastUpdateTime = table.Column<DateTime>(type: "TEXT", nullable: false),

@@ -39,7 +39,7 @@ public class VerificationTest
     [Test]
     public void TestVerifyRequest()
     {
-        Assert.That(Verification.VerifyRequest(ValidSignatureHeader, ValidSecret, ValidBody), Is.EqualTo(true));
+        Assert.That(Verification.VerifyRequest(ValidSignatureHeader, ValidSecret, ValidBody).Valid, Is.EqualTo(true));
     }
     
     /// <summary>
@@ -48,7 +48,7 @@ public class VerificationTest
     [Test]
     public void TestVerifyRequestBadSecret()
     {
-        Assert.That(Verification.VerifyRequest(ValidSignatureHeader, "tent", ValidBody), Is.EqualTo(false));
+        Assert.That(Verification.VerifyRequest(ValidSignatureHeader, "tent", ValidBody).Valid, Is.EqualTo(false));
     }
     
     /// <summary>
@@ -57,7 +57,7 @@ public class VerificationTest
     [Test]
     public void TestVerifyRequestBadTimestamp()
     {
-        Assert.That(Verification.VerifyRequest("t=1681441531,v1=paQDFIOugCVzRKuJPoN2l9alCyBySHgIkUpbMIKlWJY=", ValidSecret, ValidBody), Is.EqualTo(false));
+        Assert.That(Verification.VerifyRequest("t=1681441531,v1=paQDFIOugCVzRKuJPoN2l9alCyBySHgIkUpbMIKlWJY=", ValidSecret, ValidBody).Valid, Is.EqualTo(false));
     }
     
     /// <summary>
@@ -66,7 +66,7 @@ public class VerificationTest
     [Test]
     public void TestVerifyRequestBadBody()
     {
-        Assert.That(Verification.VerifyRequest(ValidSignatureHeader, ValidSecret, "{\"NotificationId\":\"74c4e627-52dd-4b69-a918-e5a6aec43c2e\",\"EventType\":\"SampleNotification\",\"EventTime\":\"2023-04-14T03:05:34.4767037Z\",\"EventPayload\":{\"UserId\":25691148}}"), Is.EqualTo(false));
+        Assert.That(Verification.VerifyRequest(ValidSignatureHeader, ValidSecret, "{\"NotificationId\":\"74c4e627-52dd-4b69-a918-e5a6aec43c2e\",\"EventType\":\"SampleNotification\",\"EventTime\":\"2023-04-14T03:05:34.4767037Z\",\"EventPayload\":{\"UserId\":25691148}}").Valid, Is.EqualTo(false));
     }
     
     /// <summary>
@@ -75,7 +75,7 @@ public class VerificationTest
     [Test]
     public void TestVerifyRequestBadSignature()
     {
-        Assert.That(Verification.VerifyRequest("t=1681441534,v1=1aQDFIOugCVzRKuJPoN2l9alCyBySHgIkUpbMIKlWJY=", ValidSecret, ValidBody), Is.EqualTo(false));
+        Assert.That(Verification.VerifyRequest("t=1681441534,v1=1aQDFIOugCVzRKuJPoN2l9alCyBySHgIkUpbMIKlWJY=", ValidSecret, ValidBody).Valid, Is.EqualTo(false));
     }
     
     /// <summary>
@@ -84,7 +84,7 @@ public class VerificationTest
     [Test]
     public void TestVerifyRequestNoSignature()
     {
-        Assert.That(Verification.VerifyRequest("t=1681441534", ValidSecret, ValidBody), Is.EqualTo(false));
+        Assert.That(Verification.VerifyRequest("t=1681441534", ValidSecret, ValidBody).Valid, Is.EqualTo(false));
     }
     
     /// <summary>
@@ -93,7 +93,7 @@ public class VerificationTest
     [Test]
     public void TestVerifyRequestInvalidTimestampHeader()
     {
-        Assert.That(Verification.VerifyRequest("t2=1681441534,v1=paQDFIOugCVzRKuJPoN2l9alCyBySHgIkUpbMIKlWJY=", ValidSecret, ValidBody), Is.EqualTo(false));
+        Assert.That(Verification.VerifyRequest("t2=1681441534,v1=paQDFIOugCVzRKuJPoN2l9alCyBySHgIkUpbMIKlWJY=", ValidSecret, ValidBody).Valid, Is.EqualTo(false));
     }
     
     /// <summary>
@@ -102,28 +102,7 @@ public class VerificationTest
     [Test]
     public void TestVerifyRequestUnsetValueHeader()
     {
-        Assert.That(Verification.VerifyRequest("t2=1681441534,v1", ValidSecret, ValidBody), Is.EqualTo(false));
-    }
-    
-    /// <summary>
-    /// Tests VerifyRequest with a HttpRequest.
-    /// </summary>
-    [Test]
-    public void TestVerifyRequestHttpRequest()
-    {
-        var requestContext = new DefaultHttpContext();
-        requestContext.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
-        Assert.That(Verification.VerifyRequest(requestContext.Request, ValidSecret, ValidBody), Is.EqualTo(true));
-    }
-    
-    /// <summary>
-    /// Tests VerifyRequest with a HttpRequest but with no request.
-    /// </summary>
-    [Test]
-    public void TestVerifyRequestHttpRequestNoHeader()
-    {
-        var context = new DefaultHttpContext();
-        Assert.That(Verification.VerifyRequest(context.Request, ValidSecret, ValidBody), Is.EqualTo(false));
+        Assert.That(Verification.VerifyRequest("t2=1681441534,v1", ValidSecret, ValidBody).Valid, Is.EqualTo(false));
     }
     
     /// <summary>
@@ -147,7 +126,7 @@ public class VerificationTest
         
         var requestContext = new DefaultHttpContext();
         requestContext.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
-        Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result, Is.EqualTo(true));
+        Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result.Valid, Is.EqualTo(true));
     }
     
     /// <summary>
@@ -171,6 +150,6 @@ public class VerificationTest
         
         var requestContext = new DefaultHttpContext();
         requestContext.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
-        Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result, Is.EqualTo(false));
+        Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result.Valid, Is.EqualTo(false));
     }
 }
