@@ -10,7 +10,7 @@ public static class ClearDataStores
     /// <summary>
     /// Communicator used for making requests to Roblox Open cloud.
     /// </summary>
-    public static IRobloxOpenCloudCommunicator RobloxOpenCloudCommunicator { get; set; } = new RobloxOpenCloudCommunicator();
+    public static IRobloxOpenCloudCommunicator RobloxOpenCloudCommunicator { get; set; } = new CachingRobloxOpenCloudCommunicator();
     
     /// <summary>
     /// Clears the data of a Roblox user.
