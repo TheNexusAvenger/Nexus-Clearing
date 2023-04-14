@@ -48,10 +48,10 @@ public static class ClearDataStores
                 {
                     var dataStoreName = dataStoreKey.DataStoreName.Replace("{UserId}", userId.ToString());
                     var key = dataStoreKey.DataStoreKey.Replace("{UserId}", userId.ToString());
-                    if (await RobloxOpenCloudCommunicator.HasDataAsync(gameId, dataStoreName, key))
+                    Logger.Debug($"Deleting key {key} in DataStore {dataStoreName} for user {userId}.");
+                    if (await RobloxOpenCloudCommunicator.DeleteKeyAsync(gameId, openCloudKey.OpenCloudApiKey, dataStoreName, key))
                     {
-                        Logger.Debug($"Deleting key {key} in DataStore {dataStoreName} for user {userId}.");
-                        await RobloxOpenCloudCommunicator.DeleteKeyAsync(gameId, dataStoreName, key);
+                        Logger.Debug($"Deleted key {key} in DataStore {dataStoreName} for user {userId}.");
                     }
                     else
                     {

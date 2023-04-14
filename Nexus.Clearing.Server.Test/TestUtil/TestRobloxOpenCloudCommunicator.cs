@@ -8,7 +8,6 @@ public class TestRobloxOpenCloudCommunicator : IRobloxOpenCloudCommunicator
 {
     public enum OpenCloudCommunicatorCall
     {
-        HasDataAsync,
         DeleteKeyAsync,
     }
 
@@ -18,27 +17,15 @@ public class TestRobloxOpenCloudCommunicator : IRobloxOpenCloudCommunicator
     public List<(long, string, string, OpenCloudCommunicatorCall)> Calls = new List<(long, string, string, OpenCloudCommunicatorCall)>();
     
     /// <summary>
-    /// Checks if a DataStore currently has data.
-    /// </summary>
-    /// <param name="gameId">Id of the game to check.</param>
-    /// <param name="dataStoreName">Name of the DataStore to check.</param>
-    /// <param name="dataStoreKey">Key of the DataStore to check.</param>
-    /// <returns>Whether the DataStore key has any data.</returns>
-    public Task<bool> HasDataAsync(long gameId, string dataStoreName, string dataStoreKey)
-    {
-        this.Calls.Add((gameId, dataStoreName, dataStoreKey, OpenCloudCommunicatorCall.HasDataAsync));
-        return Task.FromResult(!dataStoreKey.Contains("NoData"));
-    }
-
-    /// <summary>
     /// Deletes a DataStore key.
     /// </summary>
     /// <param name="gameId">Id of the game to delete from.</param>
+    /// <param name="apiKey">Roblox Open Cloud API key to use.</param>
     /// <param name="dataStoreName">Name of the DataStore to delete from.</param>
     /// <param name="dataStoreKey">Key of the DataStore to delete.</param>
-    public Task DeleteKeyAsync(long gameId, string dataStoreName, string dataStoreKey)
+    public Task<bool> DeleteKeyAsync(long gameId, string apiKey, string dataStoreName, string dataStoreKey)
     {
         this.Calls.Add((gameId, dataStoreName, dataStoreKey, OpenCloudCommunicatorCall.DeleteKeyAsync));
-        return Task.CompletedTask;
+        return Task.FromResult(!dataStoreKey.Contains("NoData"));
     }
 }
