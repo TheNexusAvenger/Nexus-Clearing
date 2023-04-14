@@ -16,7 +16,7 @@ public class RobloxUserTest
         {
             GameIds = "123,456,789",
         };
-        Assert.That(user.GetGameIds(), Is.EqualTo(new List<long>() {123, 456, 789}));
+        Assert.That(user.GetGameIds(), Is.EqualTo(new HashSet<long>() {123, 456, 789}));
     }
     
     /// <summary>
@@ -29,7 +29,7 @@ public class RobloxUserTest
         {
             GameIds = "",
         };
-        Assert.That(user.GetGameIds(), Is.EqualTo(new List<long>()));
+        Assert.That(user.GetGameIds(), Is.EqualTo(new HashSet<long>()));
     }
     
     /// <summary>

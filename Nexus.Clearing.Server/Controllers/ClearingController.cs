@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Nexus.Clearing.Server.Database;
 using Nexus.Clearing.Server.Database.Model;
+using Nexus.Clearing.Server.Enum;
 using Nexus.Clearing.Server.Model.Request;
 using Nexus.Clearing.Server.Util;
 
@@ -41,15 +43,41 @@ public class ClearingController : ControllerBase
             };
         }
         
-        // Store the player.
+        // Return if the user is already stored and pending clearing.
         await using var context = new SqliteContext();
-        var user = new RobloxUser()
+        var existingUser = await context.RobloxUsers.FirstOrDefaultAsync(user => user.UserId == request.EventPayload.UserId);
+        if (existingUser != null && existingUser.Status != ClearingState.Complete)
         {
-            UserId = request.EventPayload.UserId,
-        };
-        user.SetGameIds(request.EventPayload.GameIds);
-        Logger.Info($"Adding deletion request for user {request.EventPayload.UserId} for game ids {user.GameIds}");
-        await context.RobloxUsers.AddAsync(user);
+            Logger.Info($"Request to delete user {request.EventPayload.UserId} was already queued.");
+            return new ObjectResult("AlreadyQueued")
+            {
+                StatusCode = 200,
+            };
+        }
+        
+        // Store the player.
+        if (existingUser == null)
+        {
+            var user = new RobloxUser()
+            {
+                UserId = request.EventPayload.UserId,
+            };
+            user.SetGameIds(request.EventPayload.GameIds);
+            await context.RobloxUsers.AddAsync(user);
+            existingUser = user;
+        }
+        else
+        {
+            var gameIds = existingUser.GetGameIds();
+            foreach (var gameId in request.EventPayload.GameIds ?? new List<long>())
+            {
+                gameIds.Add(gameId);
+            }
+            existingUser.SetGameIds(gameIds);
+            existingUser.LastUpdateTime = DateTime.Now;
+            existingUser.Status = ClearingState.Pending;
+        }
+        Logger.Info($"Adding deletion request for user {request.EventPayload.UserId} for game ids {existingUser.GameIds}");
         await context.SaveChangesAsync();
 
         // Start processing the deletion request in the background.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Nexus.Clearing.Server.Controllers;
 using Nexus.Clearing.Server.Database;
 using Nexus.Clearing.Server.Database.Model;
+using Nexus.Clearing.Server.Enum;
 using Nexus.Clearing.Server.Test.TestUtil;
 using NUnit.Framework;
 
@@ -90,12 +92,60 @@ public class ClearingControllerTest
     [Test]
     public void TestHandleRobloxWebhookInvalidSignature()
     {
-        using var context = new SqliteContext();
-        context.RobloxGameKeys.First().WebHookSecret = "unknown";
-        context.SaveChanges();
+        using var setupContext = new SqliteContext();
+        setupContext.RobloxGameKeys.First().WebHookSecret = "unknown";
+        setupContext.SaveChanges();
+        
         var response = this._clearingController.HandleRobloxWebhook().Result;
+        using var context = new SqliteContext();
         Assert.That(response.StatusCode, Is.EqualTo(401));
         Assert.That(response.Value, Is.EqualTo("InvalidSignature"));
         Assert.That(context.RobloxUsers.Count(), Is.EqualTo(0));
+    }
+    
+    /// <summary>
+    /// Tests HandleRobloxWebhook with an already queued user.
+    /// </summary>
+    [Test]
+    public void TestHandleRobloxWebhookQueuedUser()
+    {
+        using var setupContext = new SqliteContext();
+        setupContext.RobloxUsers.Add(new RobloxUser()
+        {
+            UserId = 12345,
+            GameIds = "123,789",
+            Status = ClearingState.Pending,
+        });
+        setupContext.SaveChanges();
+        
+        var response = this._clearingController.HandleRobloxWebhook().Result;
+        using var context = new SqliteContext();
+        Assert.That(response.StatusCode, Is.EqualTo(200));
+        Assert.That(response.Value, Is.EqualTo("AlreadyQueued"));
+        Assert.That(context.RobloxUsers.Count(), Is.EqualTo(1));
+    }
+    
+    /// <summary>
+    /// Tests HandleRobloxWebhook with an already cleared user.
+    /// </summary>
+    [Test]
+    public void TestHandleRobloxWebhookClearedUser()
+    {
+        using var setupContext = new SqliteContext();
+        setupContext.RobloxUsers.Add(new RobloxUser()
+        {
+            UserId = 12345,
+            GameIds = "123,789",
+            Status = ClearingState.Complete,
+        });
+        setupContext.SaveChanges();
+        
+        var response = this._clearingController.HandleRobloxWebhook().Result;
+        using var context = new SqliteContext();
+        Assert.That(response.StatusCode, Is.EqualTo(200));
+        Assert.That(response.Value, Is.EqualTo("Success"));
+        Assert.That(context.RobloxUsers.Count(), Is.EqualTo(1));
+        Assert.That(context.RobloxUsers.First().GameIds, Is.EqualTo("123,789,456"));
+        Assert.That(context.RobloxUsers.First().Status, Is.EqualTo(ClearingState.Pending));
     }
 }

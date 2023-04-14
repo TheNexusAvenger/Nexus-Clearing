@@ -45,9 +45,9 @@ public class RobloxUser
     /// Returns the game ids for a user.
     /// </summary>
     /// <returns>List of game ids for the user.</returns>
-    public List<long> GetGameIds()
+    public HashSet<long> GetGameIds()
     {
-        var gameIds = new List<long>();
+        var gameIds = new HashSet<long>();
         foreach (var gameIdString in this.GameIds.Split(","))
         {
             if (!long.TryParse(gameIdString, out var gameId)) continue;
