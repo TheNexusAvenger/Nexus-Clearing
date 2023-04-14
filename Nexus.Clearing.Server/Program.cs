@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Nexus.Clearing.Server;
 using Nexus.Clearing.Server.Database;
+using Nexus.Clearing.Server.Util;
 
 public class Program
 {
@@ -24,6 +25,16 @@ public class Program
         builder.Logging.ClearProviders();
         builder.Logging.AddProvider(Logger.NexusLogger);
         builder.Services.AddControllers();
+        
+        // Start background clearing.
+        Task.Run(async () =>
+        {
+            while (true)
+            {
+                await ClearDataStores.ClearPendingUsersAsync();
+                await Task.Delay(TimeSpan.FromMinutes(15));
+            }
+        });
 
         // Start the server.
         var app = builder.Build();

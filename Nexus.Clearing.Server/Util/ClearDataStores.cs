@@ -10,7 +10,7 @@ public static class ClearDataStores
     /// <summary>
     /// Communicator used for making requests to Roblox Open cloud.
     /// </summary>
-    public static IRobloxOpenCloudCommunicator RobloxOpenCloudCommunicator { get; set; } // TODO: Set default.
+    public static IRobloxOpenCloudCommunicator RobloxOpenCloudCommunicator { get; set; } = new RobloxOpenCloudCommunicator();
     
     /// <summary>
     /// Clears the data of a Roblox user.
@@ -80,6 +80,14 @@ public static class ClearDataStores
     {
         await using var context = new SqliteContext();
         var usersToClear = await context.RobloxUsers.Where(user => user.Status != ClearingState.Complete).ToListAsync();
+        if (usersToClear.Count == 0)
+        {
+            Logger.Debug("There are currently no users to clear.");
+        }
+        else
+        {
+            Logger.Info($"Attempting to clear {usersToClear.Count} users.");
+        }
         foreach (var user in usersToClear)
         {
             await ClearPendingUserAsync(user.UserId);
