@@ -152,4 +152,27 @@ public class VerificationTest
         requestContext.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
         Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result.Valid, Is.EqualTo(false));
     }
+    
+    /// <summary>
+    /// Tests VerifyRequest with a HttpRequest with no header.
+    /// </summary>
+    [Test]
+    public void TestVerifyDatabaseNoHeader()
+    {
+        using var context = new SqliteContext();
+        context.RobloxGameKeys.Add(new RobloxGameKey()
+        {
+            GameId = 1,
+            WebHookSecret = "unknown",
+        });
+        context.RobloxGameKeys.Add(new RobloxGameKey()
+        {
+            GameId = 2,
+            WebHookSecret = "test",
+        });
+        context.SaveChanges();
+        
+        var requestContext = new DefaultHttpContext();
+        Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result.Valid, Is.EqualTo(false));
+    }
 }

@@ -35,7 +35,7 @@ public class ClearingController : ControllerBase
         if (!verificationResult.Valid)
         {
             Logger.Warn($"Request had invalid signature.\nTimestamp: {verificationResult.Timestamp ?? "(None)"}\nSignature: {verificationResult.Signature ?? "(None)"}\nBody: {content}");
-            return new ObjectResult("InvalidEventType")
+            return new ObjectResult("InvalidSignature")
             {
                 StatusCode = 401,
             };
@@ -56,6 +56,9 @@ public class ClearingController : ControllerBase
         // TODO
         
         // Return success.
-        return new ObjectResult("Success");
+        return new ObjectResult("Success")
+        {
+            StatusCode = 200,
+        };
     }
 }
