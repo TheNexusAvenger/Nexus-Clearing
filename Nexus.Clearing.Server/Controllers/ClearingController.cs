@@ -79,9 +79,6 @@ public class ClearingController : ControllerBase
         }
         Logger.Info($"Adding deletion request for user {request.EventPayload.UserId} for game ids {existingUser.GameIds}");
         await context.SaveChangesAsync();
-
-        // Start processing the deletion request in the background.
-        // TODO
         
         // Return success.
         return new ObjectResult("Success")
