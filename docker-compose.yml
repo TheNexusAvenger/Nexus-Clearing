@@ -1,6 +1,6 @@
 services:
   nexus-clearing-server:
-  container_name: NexusClearingServer
+    container_name: NexusClearingServer
     build:
       context: .
       dockerfile: ./Dockerfile
