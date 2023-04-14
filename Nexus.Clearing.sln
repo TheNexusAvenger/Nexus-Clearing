@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nexus.Clearing.Server", "Nexus.Clearing.Server\Nexus.Clearing.Server.csproj", "{81E53734-BB63-4BE5-B5C6-ED9F4C37DC42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nexus.Clearing.Server.Test", "Nexus.Clearing.Server.Test\Nexus.Clearing.Server.Test.csproj", "{384E2E8B-9BAB-42B7-BA21-BE780457007E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{81E53734-BB63-4BE5-B5C6-ED9F4C37DC42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81E53734-BB63-4BE5-B5C6-ED9F4C37DC42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81E53734-BB63-4BE5-B5C6-ED9F4C37DC42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{384E2E8B-9BAB-42B7-BA21-BE780457007E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{384E2E8B-9BAB-42B7-BA21-BE780457007E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{384E2E8B-9BAB-42B7-BA21-BE780457007E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{384E2E8B-9BAB-42B7-BA21-BE780457007E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
