@@ -115,7 +115,8 @@ public class ClearDataStoreTEst
         
         ClearDataStores.ClearPendingUserAsync(123).Wait();
         using var context = new SqliteContext();
-        Assert.That(this._communicator.Calls.Count, Is.EqualTo(0));
+        Assert.That(this._communicator.Calls.Count, Is.EqualTo(1));
+        Assert.That(this._communicator.Calls[0], Is.EqualTo((2, (string?) null, (string?) null, TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.GetGameIdFromPlaceIdAsync)));
         Assert.That(context.RobloxUsers.First().Status, Is.EqualTo(ClearingState.Complete));
     }
 
@@ -157,7 +158,33 @@ public class ClearDataStoreTEst
         
         ClearDataStores.ClearPendingUserAsync(123).Wait();
         using var context = new SqliteContext();
-        Assert.That(this._communicator.Calls.Count, Is.EqualTo(0));
+        Assert.That(this._communicator.Calls.Count, Is.EqualTo(1));
+        Assert.That(this._communicator.Calls[0], Is.EqualTo((4, (string?) null, (string?) null, TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.GetGameIdFromPlaceIdAsync)));
+        Assert.That(context.RobloxUsers.First().Status, Is.EqualTo(ClearingState.Complete));
+    }
+
+    /// <summary>
+    /// Tests ClearPendingUserAsync with a place id.
+    /// </summary>
+    [Test]
+    public void TestClearPendingUserAsyncPlaceId()
+    {
+        using var setupContext = new SqliteContext();
+        setupContext.RobloxUsers.Add(new RobloxUser()
+        {
+            UserId = 123,
+            GameIds = "10",
+            Status = ClearingState.Pending,
+        });
+        setupContext.SaveChanges();
+
+        ClearDataStores.ClearPendingUserAsync(123).Wait();
+        using var context = new SqliteContext();
+        Assert.That(this._communicator.Calls.Count, Is.EqualTo(4));
+        Assert.That(this._communicator.Calls[0], Is.EqualTo((10, (string?) null, (string?) null, TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.GetGameIdFromPlaceIdAsync)));
+        Assert.That(this._communicator.Calls[1], Is.EqualTo((1, "dataStore1", "dataStoreKey1", TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.DeleteKeyAsync)));
+        Assert.That(this._communicator.Calls[2], Is.EqualTo((1, "dataStore2", "dataStoreKey2_NoData", TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.DeleteKeyAsync)));
+        Assert.That(this._communicator.Calls[3], Is.EqualTo((1, "dataStore_123", "dataStoreKey_123", TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.DeleteKeyAsync)));
         Assert.That(context.RobloxUsers.First().Status, Is.EqualTo(ClearingState.Complete));
     }
 
@@ -184,10 +211,11 @@ public class ClearDataStoreTEst
         
         ClearDataStores.ClearPendingUsersAsync().Wait();
         using var context = new SqliteContext();
-        Assert.That(this._communicator.Calls.Count, Is.EqualTo(3));
+        Assert.That(this._communicator.Calls.Count, Is.EqualTo(4));
         Assert.That(this._communicator.Calls[0], Is.EqualTo((1, "dataStore1", "dataStoreKey1", TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.DeleteKeyAsync)));
         Assert.That(this._communicator.Calls[1], Is.EqualTo((1, "dataStore2", "dataStoreKey2_NoData", TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.DeleteKeyAsync)));
         Assert.That(this._communicator.Calls[2], Is.EqualTo((1, "dataStore_123", "dataStoreKey_123", TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.DeleteKeyAsync)));
+        Assert.That(this._communicator.Calls[3], Is.EqualTo((2, (string?) null, (string?) null, TestRobloxOpenCloudCommunicator.OpenCloudCommunicatorCall.GetGameIdFromPlaceIdAsync)));
         Assert.That(context.RobloxUsers.First(user => user.UserId == 123).Status, Is.EqualTo(ClearingState.Complete));
         Assert.That(context.RobloxUsers.First(user => user.UserId == 456).Status, Is.EqualTo(ClearingState.Complete));
     }

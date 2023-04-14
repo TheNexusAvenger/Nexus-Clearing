@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using Newtonsoft.Json;
+using Nexus.Clearing.Server.Model.Response;
 
 namespace Nexus.Clearing.Server.Communicator.Roblox;
 
@@ -13,6 +15,16 @@ public class RobloxOpenCloudCommunicator : IRobloxOpenCloudCommunicator
     /// Static HTTP client for making requests.
     /// </summary>
     private static readonly HttpClient HttpClient = new HttpClient();
+
+    /// <summary>
+    /// Fetches the game id for a place id, if it exists.
+    /// </summary>
+    /// <param name="placeId">Place id to search with.</param>
+    /// <returns>Game id that contains the place id, if any.</returns>
+    public async Task<long?> GetGameIdFromPlaceIdAsync(long placeId)
+    {
+        return JsonConvert.DeserializeObject<UniverseResponse>(await (await HttpClient.GetAsync($"https://apis.roblox.com/universes/v1/places/{placeId}/universe")).Content.ReadAsStringAsync())?.UniverseId;
+    }
     
     /// <summary>
     /// Deletes a DataStore key.

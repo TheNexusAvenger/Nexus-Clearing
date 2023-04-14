@@ -26,14 +26,27 @@ public static class ClearDataStores
         {
             // Delete the DataStores.
             Logger.Info($"Clearing data for {userId}.");
-            foreach (var gameId in user.GetGameIds())
+            foreach (var initialGameId in user.GetGameIds())
             {
                 // Ignore the game if there is no DataStore keys.
+                var gameId = initialGameId;
                 var dataStoreKeys = await context.DataStores.Where(dataStore => dataStore.GameId == gameId).ToListAsync();
                 if (dataStoreKeys.Count == 0)
                 {
-                    Logger.Debug($"User {userId} was meant to be cleared for {gameId} but has no DataStore keys.");
-                    continue;
+                    var gameIdFromPlaceId = await RobloxOpenCloudCommunicator.GetGameIdFromPlaceIdAsync(gameId);
+                    if (gameIdFromPlaceId != null)
+                    {
+                        dataStoreKeys = await context.DataStores.Where(dataStore => dataStore.GameId == gameIdFromPlaceId.Value).ToListAsync();
+                        if (dataStoreKeys.Count != 0)
+                        {
+                            gameId = gameIdFromPlaceId.Value;
+                        }
+                    }
+                    if (dataStoreKeys.Count == 0)
+                    {
+                        Logger.Debug($"User {userId} was meant to be cleared for {gameId} but has no DataStore keys.");
+                        continue;
+                    }
                 }
                 
                 // Throw an exception if there is no Open Cloud key.
@@ -49,7 +62,7 @@ public static class ClearDataStores
                     var dataStoreName = dataStoreKey.DataStoreName.Replace("{UserId}", userId.ToString());
                     var key = dataStoreKey.DataStoreKey.Replace("{UserId}", userId.ToString());
                     Logger.Debug($"Deleting key {key} in DataStore {dataStoreName} for user {userId}.");
-                    if (await RobloxOpenCloudCommunicator.DeleteKeyAsync(gameId, openCloudKey.OpenCloudApiKey, dataStoreName, key))
+                    if (await RobloxOpenCloudCommunicator.DeleteKeyAsync(dataStoreKey.GameId, openCloudKey.OpenCloudApiKey, dataStoreName, key))
                     {
                         Logger.Debug($"Deleted key {key} in DataStore {dataStoreName} for user {userId}.");
                     }

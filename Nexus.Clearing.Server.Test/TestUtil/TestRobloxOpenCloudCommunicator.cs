@@ -8,6 +8,7 @@ public class TestRobloxOpenCloudCommunicator : IRobloxOpenCloudCommunicator
 {
     public enum OpenCloudCommunicatorCall
     {
+        GetGameIdFromPlaceIdAsync,
         DeleteKeyAsync,
     }
 
@@ -15,6 +16,17 @@ public class TestRobloxOpenCloudCommunicator : IRobloxOpenCloudCommunicator
     /// Previous calls made to the communicator.
     /// </summary>
     public List<(long, string, string, OpenCloudCommunicatorCall)> Calls = new List<(long, string, string, OpenCloudCommunicatorCall)>();
+    
+    /// <summary>
+    /// Fetches the game id for a place id, if it exists.
+    /// </summary>
+    /// <param name="placeId">Place id to search with.</param>
+    /// <returns>Game id that contains the place id, if any.</returns>
+    public Task<long?> GetGameIdFromPlaceIdAsync(long placeId)
+    {
+        this.Calls.Add((placeId, null, null, OpenCloudCommunicatorCall.GetGameIdFromPlaceIdAsync)!);
+        return Task.FromResult(placeId == 10 ? (long?) 1L : null);
+    }
     
     /// <summary>
     /// Deletes a DataStore key.

@@ -3,6 +3,13 @@
 public interface IRobloxOpenCloudCommunicator
 {
     /// <summary>
+    /// Fetches the game id for a place id, if it exists.
+    /// </summary>
+    /// <param name="placeId">Place id to search with.</param>
+    /// <returns>Game id that contains the place id, if any.</returns>
+    public Task<long?> GetGameIdFromPlaceIdAsync(long placeId);
+    
+    /// <summary>
     /// Deletes a DataStore key.
     /// </summary>
     /// <param name="gameId">Id of the game to delete from.</param>
