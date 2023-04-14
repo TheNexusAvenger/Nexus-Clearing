@@ -17,5 +17,3 @@ services:
       start_period: 10s
     volumes:
       - ./database.sqlite:/data/database.sqlite
-    ports:
-      - 8000:8000
