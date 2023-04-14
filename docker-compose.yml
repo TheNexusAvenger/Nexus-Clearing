@@ -1,0 +1,21 @@
+services:
+  nexus-clearing-server:
+  container_name: NexusClearingServer
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - CONFIGURATION_FILE_PATH=configurations/configuration.json
+    restart: always
+    environment:
+      DATABASE_LOCATION: /data/database.sqlite
+    healthcheck:
+      test: ["CMD", "wget", "--content-on-error", "-qO-", "http://localhost:8000/health"]
+      interval: 2m
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ./database.sqlite:/data/database.sqlite
+    ports:
+      - 8000:8000
