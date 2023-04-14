@@ -24,6 +24,18 @@ public class RobloxUser
     public string GameIds { get; set; } = null!;
 
     /// <summary>
+    /// Time the entry was added.
+    /// </summary>
+    [Required]
+    public DateTime RequestedTime { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// Last time the status updated.
+    /// </summary>
+    [Required]
+    public DateTime LastUpdateTime { get; set; } = DateTime.Now;
+
+    /// <summary>
     /// Status of the clearing request.
     /// </summary>
     [Required]

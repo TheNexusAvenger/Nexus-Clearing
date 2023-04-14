@@ -1,4 +1,5 @@
 ﻿using Nexus.Clearing.Server;
+using Nexus.Clearing.Server.Database;
 
 public class Program
 {
@@ -13,6 +14,9 @@ public class Program
     /// <param name="args">Arguments from the command line.</param>
     public static void Main(string[] args)
     {
+        // Update the database.
+        SqliteContext.PrepareDatabase();
+        
         // Build the server.
         Logger.Debug("Preparing server.");
         var builder = WebApplication.CreateBuilder(args);

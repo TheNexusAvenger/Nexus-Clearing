@@ -2,7 +2,7 @@
 
 namespace Nexus.Clearing.Server.Database.Model;
 
-public class GameKey
+public class RobloxGameKey
 {
     /// <summary>
     /// Id of the game the keys are for.

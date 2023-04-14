@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Nexus.Clearing.Server.Database;
+using Nexus.Clearing.Server.Database.Model;
+using Nexus.Clearing.Server.Test.TestUtil;
 using Nexus.Clearing.Server.Util;
 using NUnit.Framework;
 
@@ -20,6 +23,15 @@ public class VerificationTest
     /// Valid body from Roblox used for tests.
     /// </summary>
     public const string ValidBody = "{\"NotificationId\":\"64c4e627-52dd-4b69-a918-e5a6aec43c2e\",\"EventType\":\"SampleNotification\",\"EventTime\":\"2023-04-14T03:05:34.4767037Z\",\"EventPayload\":{\"UserId\":25691148}}";
+
+    /// <summary>
+    /// Sets up the test.
+    /// </summary>
+    [SetUp]
+    public void SetUp()
+    {
+        DatabaseUtil.ClearDatabase();
+    }
     
     /// <summary>
     /// Tests VerifyRequest with a valid signature.
@@ -99,9 +111,9 @@ public class VerificationTest
     [Test]
     public void TestVerifyRequestHttpRequest()
     {
-        var context = new DefaultHttpContext();
-        context.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
-        Assert.That(Verification.VerifyRequest(context.Request, ValidSecret, ValidBody), Is.EqualTo(true));
+        var requestContext = new DefaultHttpContext();
+        requestContext.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
+        Assert.That(Verification.VerifyRequest(requestContext.Request, ValidSecret, ValidBody), Is.EqualTo(true));
     }
     
     /// <summary>
@@ -112,5 +124,53 @@ public class VerificationTest
     {
         var context = new DefaultHttpContext();
         Assert.That(Verification.VerifyRequest(context.Request, ValidSecret, ValidBody), Is.EqualTo(false));
+    }
+    
+    /// <summary>
+    /// Tests VerifyRequest with a HttpRequest and a valid key being secret.
+    /// </summary>
+    [Test]
+    public void TestVerifyDatabase()
+    {
+        using var context = new SqliteContext();
+        context.RobloxGameKeys.Add(new RobloxGameKey()
+        {
+            GameId = 1,
+            WebHookSecret = "unknown",
+        });
+        context.RobloxGameKeys.Add(new RobloxGameKey()
+        {
+            GameId = 2,
+            WebHookSecret = "test",
+        });
+        context.SaveChanges();
+        
+        var requestContext = new DefaultHttpContext();
+        requestContext.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
+        Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result, Is.EqualTo(true));
+    }
+    
+    /// <summary>
+    /// Tests VerifyRequest with a HttpRequest and not valid key being secret.
+    /// </summary>
+    [Test]
+    public void TestVerifyDatabaseNoValidSecrets()
+    {
+        using var context = new SqliteContext();
+        context.RobloxGameKeys.Add(new RobloxGameKey()
+        {
+            GameId = 1,
+            WebHookSecret = "unknown1",
+        });
+        context.RobloxGameKeys.Add(new RobloxGameKey()
+        {
+            GameId = 2,
+            WebHookSecret = "unknown2",
+        });
+        context.SaveChanges();
+        
+        var requestContext = new DefaultHttpContext();
+        requestContext.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
+        Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result, Is.EqualTo(false));
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using Nexus.Clearing.Server.Database;
 
 namespace Nexus.Clearing.Server.Util;
 
-public class Verification
+public static class Verification
 {
     /// <summary>
     /// Determines if a signature matches a request.
@@ -50,5 +51,17 @@ public class Verification
         if (!request.Headers.TryGetValue("roblox-signature", out var headerValues)) return false;
         if (headerValues.Count == 0) return false;
         return VerifyRequest(headerValues[0]!, secret, body);
+    }
+    
+    /// <summary>
+    /// Determines if a signature matches a request with the secret for any experience.
+    /// </summary>
+    /// <param name="request">Request to verify against.</param>
+    /// <param name="body">Body of the request part of the signature.</param>
+    /// <returns>Whether the signature is valid or not.</returns>
+    public static async Task<bool> VerifyRequestAsync(HttpRequest request, string body)
+    {
+        await using var context = new SqliteContext();
+        return context.RobloxGameKeys.Select(keyEntry => keyEntry.WebHookSecret).ToHashSet().Any(secret => VerifyRequest(request, secret, body));
     }
 }
