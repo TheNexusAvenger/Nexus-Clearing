@@ -45,7 +45,7 @@ public class Program
                 var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
                 if (exceptionHandlerPathFeature != null)
                 {
-                    Logger.Error($"An exception occured processing {context.Request.Method} {context.Request.Path}\n{exceptionHandlerPathFeature.Error}");
+                    Logger.Error($"An exception occurred processing {context.Request.Method} {context.Request.Path}\n{exceptionHandlerPathFeature.Error}");
                 }
                 return Task.CompletedTask;
             });

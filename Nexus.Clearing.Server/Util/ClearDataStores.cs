@@ -80,7 +80,7 @@ public static class ClearDataStores
         }
         catch (Exception e)
         {
-            Logger.Error($"An exception occured trying to clear user {userId}:\n{e}");
+            Logger.Error($"An exception occurred trying to clear user {userId}:\n{e}");
             user.Status = ClearingState.AwaitingRetry;
         }
         user.LastUpdateTime = DateTime.Now;
