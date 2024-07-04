@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0 as build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
 ARG CONFIGURATION_FILE_PATH
 
 # Copy the application files and build them.
@@ -7,7 +7,7 @@ COPY . .
 RUN dotnet build Nexus.Clearing.Server -c release -r linux-musl-x64 --self-contained -o /publish
 
 # Switch to a container for runtime.
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine as runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine as runtime
 
 # Prepare the runtime.
 WORKDIR /app
