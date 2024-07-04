@@ -125,7 +125,7 @@ public class VerificationTest
         context.SaveChanges();
         
         var requestContext = new DefaultHttpContext();
-        requestContext.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
+        requestContext.Request.Headers.Append("roblox-signature", ValidSignatureHeader);
         Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result.Valid, Is.EqualTo(true));
     }
     
@@ -149,7 +149,7 @@ public class VerificationTest
         context.SaveChanges();
         
         var requestContext = new DefaultHttpContext();
-        requestContext.Request.Headers.Add("roblox-signature", ValidSignatureHeader);
+        requestContext.Request.Headers.Append("roblox-signature", ValidSignatureHeader);
         Assert.That(Verification.VerifyRequestAsync(requestContext.Request, ValidBody).Result.Valid, Is.EqualTo(false));
     }
     
