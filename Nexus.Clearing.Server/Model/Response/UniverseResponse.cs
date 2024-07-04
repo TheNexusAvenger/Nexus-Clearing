@@ -11,7 +11,6 @@ public class UniverseResponse
 }
 
 [JsonSerializable(typeof(UniverseResponse))]
-[JsonSourceGenerationOptions(WriteIndented=true, IncludeFields = true)]
 internal partial class UniverseResponseJsonContext : JsonSerializerContext
 {
 }

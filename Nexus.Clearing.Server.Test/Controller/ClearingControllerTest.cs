@@ -23,6 +23,11 @@ public class ClearingControllerTest
     private ClearingController _clearingController = null!;
 
     /// <summary>
+    /// HttpContext used for the tests.
+    /// </summary>
+    private HttpContext _httpContext = null!;
+
+    /// <summary>
     /// Sets the body of the test request.
     /// </summary>
     /// <param name="body">Body to set.</param>
@@ -30,12 +35,9 @@ public class ClearingControllerTest
     {
         using var sha256 = new HMACSHA256(Encoding.UTF8.GetBytes("test"));
         var newSignature = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes($"1681441534.{body}")));
-        this._clearingController.ControllerContext = new ControllerContext()
-        {
-            HttpContext = new DefaultHttpContext(),
-        };
-        this._clearingController.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body));
-        this._clearingController.Request.Headers.Add("roblox-signature", $"t=1681441534,v1={newSignature}");
+        this._httpContext = new DefaultHttpContext();
+        this._httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body));
+        this._httpContext.Request.Headers.Append("roblox-signature", $"t=1681441534,v1={newSignature}");
     }
     
     /// <summary>
@@ -63,7 +65,7 @@ public class ClearingControllerTest
     [Test]
     public void TestHandleRobloxWebhook()
     {
-        var response = this._clearingController.HandleRobloxWebhook().Result;
+        var response = this._clearingController.HandleRobloxWebhook(this._httpContext).Result;
         Assert.That(response.StatusCode, Is.EqualTo(200));
         Assert.That(response.Value, Is.EqualTo("Success"));
         using var context = new SqliteContext();
@@ -79,7 +81,7 @@ public class ClearingControllerTest
     public void TestHandleRobloxWebhookInvalidEventType()
     {
         this.SetRequest("{\"NotificationId\":\"64c4e627-52dd-4b69-a918-e5a6aec43c2e\",\"EventType\":\"SampleNotification\",\"EventTime\":\"2023-04-14T03:05:34.4767037Z\",\"EventPayload\":{\"UserId\":12345}}");
-        var response = this._clearingController.HandleRobloxWebhook().Result;
+        var response = this._clearingController.HandleRobloxWebhook(this._httpContext).Result;
         Assert.That(response.StatusCode, Is.EqualTo(400));
         Assert.That(response.Value, Is.EqualTo("InvalidEventType"));
         using var context = new SqliteContext();
@@ -96,7 +98,7 @@ public class ClearingControllerTest
         setupContext.RobloxGameKeys.First().WebHookSecret = "unknown";
         setupContext.SaveChanges();
         
-        var response = this._clearingController.HandleRobloxWebhook().Result;
+        var response = this._clearingController.HandleRobloxWebhook(this._httpContext).Result;
         using var context = new SqliteContext();
         Assert.That(response.StatusCode, Is.EqualTo(401));
         Assert.That(response.Value, Is.EqualTo("InvalidSignature"));
@@ -118,7 +120,7 @@ public class ClearingControllerTest
         });
         setupContext.SaveChanges();
         
-        var response = this._clearingController.HandleRobloxWebhook().Result;
+        var response = this._clearingController.HandleRobloxWebhook(this._httpContext).Result;
         using var context = new SqliteContext();
         Assert.That(response.StatusCode, Is.EqualTo(200));
         Assert.That(response.Value, Is.EqualTo("AlreadyQueued"));
@@ -140,7 +142,7 @@ public class ClearingControllerTest
         });
         setupContext.SaveChanges();
         
-        var response = this._clearingController.HandleRobloxWebhook().Result;
+        var response = this._clearingController.HandleRobloxWebhook(this._httpContext).Result;
         using var context = new SqliteContext();
         Assert.That(response.StatusCode, Is.EqualTo(200));
         Assert.That(response.Value, Is.EqualTo("Success"));

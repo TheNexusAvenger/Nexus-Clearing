@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Nexus.Clearing.Server;
+using Nexus.Clearing.Server.Controllers;
 using Nexus.Clearing.Server.Database;
 using Nexus.Clearing.Server.Util;
 
@@ -21,10 +22,9 @@ public class Program
         
         // Build the server.
         Logger.Debug("Preparing server.");
-        var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateSlimBuilder(args);
         builder.Logging.ClearProviders();
         builder.Logging.AddProvider(Logger.NexusLogger);
-        builder.Services.AddControllers();
         
         // Start background clearing.
         Task.Run(async () =>
@@ -36,7 +36,7 @@ public class Program
             }
         });
 
-        // Start the server.
+        // Add exception handling.
         var app = builder.Build();
         app.UseExceptionHandler(exceptionHandlerApp =>
         {
@@ -50,7 +50,14 @@ public class Program
                 return Task.CompletedTask;
             });
         });
-        app.MapControllers();
+        
+        // Register the routes.
+        var healthController = new HealthController();
+        var clearingController = new ClearingController();
+        app.MapGet("/health", () => healthController.Get());
+        app.MapPost("/clearing/roblox", async (context) => await clearingController.HandleRobloxWebhook(context));
+        
+        // Start the server.
         Logger.Info($"Starting server on port {Port}.");
         app.Run($"http://*:{Port}");
     }

@@ -9,20 +9,16 @@ using Nexus.Clearing.Server.Util;
 
 namespace Nexus.Clearing.Server.Controllers;
 
-[ApiController]
-[Route("/clearing")]
-public class ClearingController : ControllerBase
+public class ClearingController
 {
     /// <summary>
     /// Route for Roblox's webhook.
     /// </summary>
-    [HttpPost]
-    [Route("roblox")]
-    public async Task<ObjectResult> HandleRobloxWebhook()
+    public async Task<ObjectResult> HandleRobloxWebhook(HttpContext httpContext)
     {
         // Read the body of the request.
-        var content = await new StreamReader(this.Request.Body).ReadToEndAsync();
-        var request = JsonSerializer.Deserialize<RobloxNotification<RightToErasureRequestEventPayload>>(content)!;
+        var content = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
+        var request = JsonSerializer.Deserialize<RobloxNotification<RightToErasureRequestEventPayload>>(content, RobloxNotificationJsonContext.Default.RobloxNotificationRightToErasureRequestEventPayload)!;
         if (request.EventType != "RightToErasureRequest")
         {
             Logger.Warn($"Got request for {request.EventType} instead of RightToErasureRequest.");
@@ -33,7 +29,7 @@ public class ClearingController : ControllerBase
         }
         
         // Verify the signature of the request.
-        var verificationResult = await Verification.VerifyRequestAsync(this.Request, content);
+        var verificationResult = await Verification.VerifyRequestAsync(httpContext.Request, content);
         if (!verificationResult.Valid)
         {
             Logger.Warn($"Request had invalid signature.\nTimestamp: {verificationResult.Timestamp ?? "(None)"}\nSignature: {verificationResult.Signature ?? "(None)"}\nBody: {content}");

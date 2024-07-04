@@ -1,4 +1,6 @@
-﻿namespace Nexus.Clearing.Server.Model.Request;
+﻿using System.Text.Json.Serialization;
+
+namespace Nexus.Clearing.Server.Model.Request;
 
 public class RobloxNotification<T> where T : class
 {
@@ -21,4 +23,10 @@ public class RobloxNotification<T> where T : class
     /// Payload of the event.
     /// </summary>
     public T EventPayload { get; set; } = null!;
+}
+
+[JsonSerializable(typeof(RobloxNotification<RightToErasureRequestEventPayload>), TypeInfoPropertyName = "RobloxNotificationRightToErasureRequestEventPayload")]
+[JsonSerializable(typeof(RightToErasureRequestEventPayload), TypeInfoPropertyName = "RightToErasureRequestEventPayload")]
+internal partial class RobloxNotificationJsonContext : JsonSerializerContext
+{
 }
