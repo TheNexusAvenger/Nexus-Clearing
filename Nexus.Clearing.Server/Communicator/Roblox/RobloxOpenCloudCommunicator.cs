@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Nexus.Clearing.Server.Model.Response;
 
 namespace Nexus.Clearing.Server.Communicator.Roblox;
@@ -23,7 +23,8 @@ public class RobloxOpenCloudCommunicator : IRobloxOpenCloudCommunicator
     /// <returns>Game id that contains the place id, if any.</returns>
     public async Task<long?> GetGameIdFromPlaceIdAsync(long placeId)
     {
-        return JsonConvert.DeserializeObject<UniverseResponse>(await (await HttpClient.GetAsync($"https://apis.roblox.com/universes/v1/places/{placeId}/universe")).Content.ReadAsStringAsync())?.UniverseId;
+        var responseData = await (await HttpClient.GetAsync($"https://apis.roblox.com/universes/v1/places/{placeId}/universe")).Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<UniverseResponse>(responseData, UniverseResponseJsonContext.Default.UniverseResponse)?.UniverseId;
     }
     
     /// <summary>
