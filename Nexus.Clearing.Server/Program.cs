@@ -33,6 +33,7 @@ public class Program
         {
             builder.Logging.AddProvider(Logger.NexusLogger);
         }
+        builder.WebHost.UseKestrel(options => options.AddServerHeader = false);
         
         // Start background clearing.
         Task.Run(async () =>
