@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Nexus.Clearing.Server;
 using Nexus.Clearing.Server.Controllers;
 using Nexus.Clearing.Server.Database;
+using Nexus.Clearing.Server.Model.Response;
 using Nexus.Clearing.Server.Util;
 
 public class Program
@@ -63,8 +66,17 @@ public class Program
         // Register the routes.
         var healthController = new HealthController();
         var clearingController = new ClearingController();
-        app.MapGet("/health", () => healthController.Get());
-        app.MapPost("/clearing/roblox", async (context) => await clearingController.HandleRobloxWebhook(context));
+        app.MapGet("/health", async (context) =>
+        {
+            var response = await healthController.PerformHealthCheckAsync();
+            var statusCode = (response.Status == HealthCheckResultStatus.Down ? 503 : 200);
+            await Results.Json(response, statusCode: statusCode, jsonTypeInfo: HealthCheckResponseJsonContext.Default.HealthCheckResponse).ExecuteAsync(context);
+        });
+        app.MapPost("/clearing/roblox", async (context) =>
+        {
+            var response = await clearingController.HandleRobloxWebhook(context);
+            await Results.Text((string) response.Value!, statusCode: response.StatusCode).ExecuteAsync(context);
+        });
         
         // Start the server.
         Logger.Info($"Starting server on port {Port}.");

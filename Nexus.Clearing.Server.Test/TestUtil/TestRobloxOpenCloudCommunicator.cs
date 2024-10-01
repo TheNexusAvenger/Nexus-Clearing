@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nexus.Clearing.Server.Communicator.Roblox;
 
@@ -16,6 +17,11 @@ public class TestRobloxOpenCloudCommunicator : IRobloxOpenCloudCommunicator
     /// Previous calls made to the communicator.
     /// </summary>
     public List<(long, string, string, OpenCloudCommunicatorCall)> Calls = new List<(long, string, string, OpenCloudCommunicatorCall)>();
+
+    /// <summary>
+    /// If true, an exception will be thrown on call.
+    /// </summary>
+    public bool ThrowExceptionOnCall { get; set; } = false;
     
     /// <summary>
     /// Fetches the game id for a place id, if it exists.
@@ -37,6 +43,10 @@ public class TestRobloxOpenCloudCommunicator : IRobloxOpenCloudCommunicator
     /// <param name="dataStoreKey">Key of the DataStore to delete.</param>
     public Task<bool> DeleteKeyAsync(long gameId, string apiKey, string dataStoreName, string dataStoreKey)
     {
+        if (this.ThrowExceptionOnCall)
+        {
+            throw new Exception("Test exception");
+        }
         this.Calls.Add((gameId, dataStoreName, dataStoreKey, OpenCloudCommunicatorCall.DeleteKeyAsync));
         return Task.FromResult(!dataStoreKey.Contains("NoData"));
     }
