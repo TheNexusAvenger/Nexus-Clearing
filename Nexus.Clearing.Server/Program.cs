@@ -10,6 +10,11 @@ public class Program
     /// Port for hosting the server.
     /// </summary>
     public const ushort Port = 8000;
+
+    /// <summary>
+    /// If true, ASP.NET logging will be active.
+    /// </summary>
+    public const bool EnableAspNetLogging = false;
     
     /// <summary>
     /// Runs the program.
@@ -24,7 +29,10 @@ public class Program
         Logger.Debug("Preparing server.");
         var builder = WebApplication.CreateSlimBuilder(args);
         builder.Logging.ClearProviders();
-        builder.Logging.AddProvider(Logger.NexusLogger);
+        if (EnableAspNetLogging)
+        {
+            builder.Logging.AddProvider(Logger.NexusLogger);
+        }
         
         // Start background clearing.
         Task.Run(async () =>
