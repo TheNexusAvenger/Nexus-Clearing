@@ -50,7 +50,7 @@ public class HealthController
             
             // Try deleting a key.
             var dataStoreName = datastore.DataStoreName.Replace("{UserId}", "1");
-            var key = "NEXUS_CLEARING_TEST_" + new Guid();
+            var key = "NEXUS_CLEARING_TEST_" + Guid.NewGuid().ToString()[..6];
             try
             {
                 await this._robloxOpenCloudCommunicator.DeleteKeyAsync(datastore.GameId, openCloudKey.OpenCloudApiKey!, dataStoreName, key);
