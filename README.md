@@ -17,7 +17,7 @@ Currently, there is no configuration beyond the database file path
 and anything managed through `docker-compose.yml`.
 
 ### Server Application
-The application can be compiled and run using .NET 8. It is highly
+The application can be compiled and run using .NET 9. It is highly
 recommended to use Docker if possible for running. Using the
 `docker-compose.yml` on a system set up with Docker, the server can
 be built (or updated) and started with the following when run in the
