@@ -1,3 +1,8 @@
+## ⚠️ Unmaintained
+Nexus Clearing is unmaintained now that [this functionality has been added to Roblox](https://devforum.roblox.com/t/beta-introducing-automated-rtbf-processing-for-data-stores/4568086).
+To access RTBF Deletion management, go to your game in the Creator Hub,
+then go to "Data Stores" under "Monitoring", and then go to "RTBF Deletion".
+
 # Nexus-Clearing
 Nexus Clearing is a server application for handling GDPR deletion
 from requests and managing DataStoreService deletions.
